@@ -12,7 +12,6 @@ from __future__ import print_function
 import os
 import collections
 import subprocess
-from .hit_load import hit_load
 from .mooseutils import git_root_dir, colorText
 
 def check_requirement(filename):
@@ -58,6 +57,7 @@ def check_requirement(filename):
 
 def sqa_check(working_dir=os.getcwd(), remote='origin', branch='devel', specs=['tests'], skip=[]):
     """Check that test specifications that were modified include requirements."""
+    from .hit_load import hit_load
 
     # Fetch
     cmd = ['git', 'fetch', remote]
