@@ -13,9 +13,8 @@ endif
 
 $(info Building hit for python $(PYTHON_VERSION) with $(pyconfig))
 
-PYTHONPREFIX ?= `$(pyconfig) --prefix`
 PYTHONCFLAGS ?= `$(pyconfig) --cflags`
-PYTHONLDFLAGS ?= `$(pyconfig) --ldflags`
+PYTHONLDFLAGS ?= `python -c "import sysconfig; print(sysconfig.get_config_var('LDSHARED').replace('-clang', '-clang++'))"`
 HITCPP := hit$(PYTHON_VERSION).cpp
 
 hit: main.cc parse.cc lex.cc braceexpr.cc braceexpr.h lex.h parse.h
@@ -27,7 +26,7 @@ rewrite: rewrite.cc parse.cc lex.cc lex.h parse.h
 bindings: hit.so
 
 hit.so: parse.cc lex.cc braceexpr.cc $(HITCPP)
-	$(CXX) -std=c++11 -w -fPIC -lstdc++ -shared -L$(PYTHONPREFIX)/lib $(PYTHONCFLAGS) $(PYTHONLDFLAGS) $^ -o $@
+	$(PYTHONLDFLAGS) -std=c++11 -w $(PYTHONCFLAGS) $^ -o $@
 
 $(HITCPP): hit.pyx chit.pxd
 	cython -$(PYTHON_VERSION) -o $@ --cplus $<

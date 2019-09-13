@@ -52,7 +52,7 @@ endif
 
 hit $(pyhit_LIB): $(pyhit_srcfiles)
 	@echo "Building and linking "$@"..."
-	@bash -c '(cd "$(hit_DIR)" && $(libmesh_CXX) -std=c++11 -w -fPIC -lstdc++ -shared -L`$(pyconfig) --prefix`/lib `$(pyconfig) --includes` `$(pyconfig) --ldflags` $^ -o $(pyhit_LIB))'
+	@bash -c '(cd "$(hit_DIR)" && `python -c "import sysconfig; print(sysconfig.get_config_var('LDSHARED').replace('-clang)', '-clang++')"` -std=c++11 -w `$(pyconfig) --cflags` $^ -o $(pyhit_LIB))'
 
 #
 # gtest
