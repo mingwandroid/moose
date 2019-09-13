@@ -6,9 +6,8 @@ ifeq (, $(shell which python2-config 2>/dev/null))
   pyconfig := python-config
 endif
 
-PYTHONPREFIX ?= `$(pyconfig) --prefix`
 PYTHONCFLAGS ?= `$(pyconfig) --cflags`
-PYTHONLDFLAGS ?= `$(pyconfig) --ldflags`
+PYTHONLDFLAGS ?= `python -c "import sysconfig; print(sysconfig.get_config_var('LDSHARED'))"`
 
 hit: main.cc parse.cc lex.cc braceexpr.cc braceexpr.h lex.h parse.h
 	$(CXX) -std=c++11 -g $(CXXFLAGS) $< parse.cc lex.cc braceexpr.cc -o $@
@@ -19,7 +18,7 @@ rewrite: rewrite.cc parse.cc lex.cc lex.h parse.h
 bindings: hit.so
 
 hit.so: parse.cc lex.cc hit.cpp
-	$(CXX) -std=c++11 -w -fPIC -lstdc++ -shared -L$(PYTHONPREFIX)/lib $(PYTHONCFLAGS) $(PYTHONLDFLAGS) $^ -o $@
+	$(CXX) -std=c++11 -w $(PYTHONCFLAGS) $(PYTHONLDFLAGS) $^ -o $@
 
 hit.cpp: hit.pyx chit.pxd
 	cython --cplus $<
